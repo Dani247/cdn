@@ -1,4 +1,4 @@
-## Storage system written in NodeJS
+## NodeJS Storage System written in TypeScript
 
 #### Required Environment Variables
 
