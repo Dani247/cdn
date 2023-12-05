@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
+import cors from 'cors';
 import routes from './controllers';
 // CHECK PORT
 const port = process.env.PORT;
@@ -13,6 +14,10 @@ if (!process.env.STORAGE_PATH) {
 }
 // INITIALIZE APP
 const app: express.Application = express();
+
+// TODO: condig cors
+app.use(cors());
+
 // INITIALIZE ROUTES
 routes(app);
 // START

@@ -4,6 +4,7 @@ import multer, { DiskStorageOptions, FileFilterCallback } from 'multer';
 import path from 'path';
 import { v4 } from 'uuid'
 import { pool } from '../utils/db';
+import { log } from 'console';
 
 const router = Router();
 const storagePath = process.env.STORAGE_PATH;
@@ -11,7 +12,6 @@ const storagePath = process.env.STORAGE_PATH;
 const storage = multer.diskStorage({
     destination: storagePath,
     filename: async function (req, file, cb) {
-        await pool.query("BEGIN");
         const id = v4();
         const extension = path.extname(file.originalname);
         const record = {
@@ -29,8 +29,8 @@ const storage = multer.diskStorage({
         `;
 
         const res = await pool.query(query, [id, new Date(), extension, record.originalname, record.mimetype]);
-        console.log("NEW RECORD: ", record.filename)
-        console.log('Insert successful:', res.rowCount);
+        log("NEW RECORD: ", record.filename)
+        log('Insert successful:', res.rowCount);
         cb(null, record.filename);
     }
 });
@@ -68,5 +68,17 @@ router.get('/download/:filename', (req, res) => {
         res.download(file);
     }
 });
+
+router.get('/files', async (req, res) => {
+    try {
+        const query = `
+            SELECT * FROM files;
+        `;
+        const result = await pool.query(query);
+        res.status(200).send(result.rows);
+    } catch (error) {
+        res.status(500).send({ error })
+    }
+})
 
 export default router;
